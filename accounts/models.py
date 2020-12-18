@@ -19,6 +19,15 @@ class User(AbstractUser):
 
 
 class UserProfile(models.Model):
+    surrogate = models.UUIDField(default=uuid.uuid4, db_index=True)
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="profile")
     name = models.CharField(blank=False, null=False, max_length=60, default="")
+    avatar = models.ImageField(upload_to='avatars', null=True, blank=True)
     is_therapist = models.BooleanField(default=False)
+    stripe_id = models.CharField(max_length=40, null=True, blank=True)
+    stripe_account_link = models.URLField(blank=True, null=True)
+    created = models.IntegerField(null=True, blank=True)
+    expires_at = models.IntegerField(null=True, blank=True)
+
+    def __str__(self):
+        return f'{self.user.email} - {self.name}'
