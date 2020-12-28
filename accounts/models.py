@@ -11,9 +11,10 @@ class User(AbstractUser):
         swappable = "AUTH_USER_MODEL"
         db_table = "auth_user"
 
-    REQUIRED_FIELDS = ['username']
+    REQUIRED_FIELDS = []
     USERNAME_FIELD = 'email'
-    username = models.CharField(blank=False, null=False, max_length=30)
+    username = None
+    #username = models.CharField(blank=True, null=True, max_length=30)
     email = models.EmailField(unique=True, db_index=True)
     surrogate = models.UUIDField(default=uuid.uuid4, db_index=True, unique=True)
 

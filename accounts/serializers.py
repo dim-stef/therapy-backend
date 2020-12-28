@@ -13,13 +13,20 @@ import stripe
 class RegistrationSerializer(RegisterSerializer):
     is_therapist = serializers.BooleanField(required=False, write_only=True)
     name = serializers.CharField(required=True, write_only=True, max_length=60)
+    bio = serializers.CharField(max_length=300, write_only=True, required=False)
 
     def get_cleaned_data(self):
+        print(self.validated_data)
         return {
             'is_therapist': self.validated_data.get('is_therapist', ''),
             'name': self.validated_data.get('name', ''),
             'password1': self.validated_data.get('password1', ''),
             'email': self.validated_data.get('email', ''),
+            'bio': self.validated_data.get('bio', ''),
+            'phone_number': self.validated_data.get('phone_number', ''),
+            'office_number': self.validated_data.get('office_number', ''),
+            #'specialisation': self.validated_data.get('specialisation', ''),
+            'address': self.validated_data.get('address', ''),
         }
 
     def save(self, request):
@@ -29,12 +36,20 @@ class RegistrationSerializer(RegisterSerializer):
         adapter.save_user(request, user, self)
         setup_user_email(request, user, [])
 
+        if self.cleaned_data.get('is_therapist', False):
+            is_therapist = True
+        else:
+            is_therapist = False
         user_profile = UserProfile.objects.create(user=user,
-                                                  is_therapist=self.cleaned_data.get('is_therapist', False),
+                                                  is_therapist=is_therapist,
                                                   name=self.cleaned_data.get('name', ''))
 
-        if self.cleaned_data.get('is_therapist', False):
-            Therapist.objects.create(user=user, bio=self.cleaned_data.get('bio', ''))
+        if is_therapist:
+            Therapist.objects.create(user=user, bio=self.cleaned_data.get('bio', ''),
+                                     phone_number=self.validated_data.get('phone_number', ''),
+                                     office_number=self.validated_data.get('office_number', ''),
+                                     #specialisation=self.validated_data.get('specialisation', ''),
+                                     address=self.validated_data.get('address', ''))
         account = setup_stripe_account(user, user_profile)
 
         user_profile.save()
