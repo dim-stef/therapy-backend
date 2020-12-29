@@ -11,9 +11,9 @@ class User(AbstractUser):
         swappable = "AUTH_USER_MODEL"
         db_table = "auth_user"
 
-    REQUIRED_FIELDS = []
+    REQUIRED_FIELDS = ['username']
     USERNAME_FIELD = 'email'
-    username = None
+    username = models.CharField(blank=True, null=True, max_length=30)
     #username = models.CharField(blank=True, null=True, max_length=30)
     email = models.EmailField(unique=True, db_index=True)
     surrogate = models.UUIDField(default=uuid.uuid4, db_index=True, unique=True)
@@ -27,6 +27,7 @@ class UserProfile(models.Model):
     is_therapist = models.BooleanField(default=False)
     stripe_id = models.CharField(max_length=40, null=True, blank=True)
     stripe_account_link = models.URLField(blank=True, null=True)
+    charges_enabled = models.BooleanField(default=False)
     created = models.IntegerField(null=True, blank=True)
     expires_at = models.IntegerField(null=True, blank=True)
 

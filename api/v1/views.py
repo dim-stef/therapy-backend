@@ -23,7 +23,7 @@ class TherapistsViewSet(viewsets.GenericViewSet, mixins.ListModelMixin):
     serializer_class = serializers.TherapistWithSessionsSerializer
 
     def get_queryset(self):
-        return Therapist.objects.all()
+        return Therapist.objects.filter(user__profile__charges_enabled=True)
 
 
 class CreateTherapySessionViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin):
@@ -245,6 +245,15 @@ def check_out_success_webhook(request):
         payment_method = event.data.object # contains a stripe.PaymentMethod
         print('PaymentMethod was attached to a Customer!')
     # ... handle other event types
+    elif event.type == 'account.updated':
+        account = event.data.object
+        charges_enabled = account.get('charges_enabled', '')
+        user_profile = UserProfile.objects.get(user__email=account.get('email', ''))
+        print(account)
+        print(user_profile)
+
+        user_profile.charges_enabled = charges_enabled
+        user_profile.save()
     else:
         print('Unhandled event type {}'.format(event.type))
     return HttpResponse(status=200)

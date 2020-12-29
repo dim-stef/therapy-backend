@@ -6,18 +6,10 @@ import stripe
 
 
 class UserProfileSerializer(serializers.ModelSerializer):
-    charges_enabled = serializers.SerializerMethodField()
     id = serializers.SerializerMethodField()
 
     def get_id(self, profile):
         return profile.surrogate
-
-    def get_charges_enabled(self, profile):
-        if profile.stripe_id:
-            stripe.api_key = os.environ.get('STRIPE_SECRET_KEY')
-            account = stripe.Account.retrieve(profile.stripe_id)
-            return account.charges_enabled
-        return None
 
     class Meta:
         model = UserProfile

@@ -50,7 +50,9 @@ class RegistrationSerializer(RegisterSerializer):
                                      office_number=self.validated_data.get('office_number', ''),
                                      #specialisation=self.validated_data.get('specialisation', ''),
                                      address=self.validated_data.get('address', ''))
-        account = setup_stripe_account(user, user_profile)
+            # only handling stripe accounts for therapists for now
+            # TODO run this again in case of migration from regular account -> therapist account
+            account = setup_stripe_account(user, user_profile)
 
         user_profile.save()
         user.save()
