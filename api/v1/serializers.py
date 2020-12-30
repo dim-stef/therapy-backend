@@ -108,7 +108,7 @@ class TherapistSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Therapist
-        fields = ['id', 'bio', 'profile', 'availability_times']
+        fields = ['id', 'bio', 'profile', 'availability_times', 'status']
 
 
 class TherapistWithSessionsSerializer(serializers.ModelSerializer):
@@ -131,7 +131,7 @@ class TherapistWithSessionsSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Therapist
-        fields = ['id', 'bio', 'profile', 'sessions', 'availability_times']
+        fields = ['id', 'bio', 'profile', 'sessions', 'availability_times', 'status']
 
 
 class UpdateTherapistProfileSerializer(serializers.ModelSerializer):

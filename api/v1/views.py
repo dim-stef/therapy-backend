@@ -248,7 +248,7 @@ def check_out_success_webhook(request):
     elif event.type == 'account.updated':
         account = event.data.object
         charges_enabled = account.get('charges_enabled', '')
-        user_profile = UserProfile.objects.get(user__email=account.get('email', ''))
+        user_profile = UserProfile.objects.get(stripe_id=account.get('id', ''))
         print(account)
         print(user_profile)
 
