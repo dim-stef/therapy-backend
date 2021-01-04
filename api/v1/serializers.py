@@ -93,6 +93,7 @@ class CreateTherapySessionSerializer(serializers.ModelSerializer):
 
 
 class TherapistSerializer(serializers.ModelSerializer):
+    specialties = serializers.StringRelatedField(many=True)
     availability_times = serializers.SerializerMethodField()
     profile = serializers.SerializerMethodField()
     id = serializers.SerializerMethodField()
@@ -108,10 +109,11 @@ class TherapistSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Therapist
-        fields = ['id', 'bio', 'profile', 'availability_times', 'status']
+        fields = ['id', 'bio', 'profile', 'availability_times', 'status', 'specialties']
 
 
 class TherapistWithSessionsSerializer(serializers.ModelSerializer):
+    specialties = serializers.StringRelatedField(many=True)
     profile = serializers.SerializerMethodField()
     availability_times = serializers.SerializerMethodField()
     sessions = serializers.SerializerMethodField()
@@ -131,7 +133,7 @@ class TherapistWithSessionsSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Therapist
-        fields = ['id', 'bio', 'profile', 'sessions', 'availability_times', 'status']
+        fields = ['id', 'bio', 'profile', 'sessions', 'availability_times', 'status', 'specialties']
 
 
 class UpdateTherapistProfileSerializer(serializers.ModelSerializer):

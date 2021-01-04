@@ -5,7 +5,7 @@ from rest_auth.registration.serializers import RegisterSerializer
 from allauth.account.adapter import get_adapter
 from allauth.account.utils import setup_user_email
 from rest_framework import serializers
-from therapist.models import Therapist
+from therapist.models import Therapist, TherapistSpecialties
 from .models import UserProfile
 import stripe
 
@@ -14,6 +14,8 @@ class RegistrationSerializer(RegisterSerializer):
     is_therapist = serializers.BooleanField(required=False, write_only=True)
     name = serializers.CharField(required=True, write_only=True, max_length=60)
     bio = serializers.CharField(max_length=300, write_only=True, required=False)
+    # specialties come as a comma separated string
+    specialties = serializers.CharField(max_length=1000, write_only=True, required=False)
 
     def get_cleaned_data(self):
         print(self.validated_data)
@@ -27,6 +29,7 @@ class RegistrationSerializer(RegisterSerializer):
             'office_number': self.validated_data.get('office_number', ''),
             #'specialisation': self.validated_data.get('specialisation', ''),
             'address': self.validated_data.get('address', ''),
+            'specialties': self.validated_data.get('specialties', '')
         }
 
     def save(self, request):
@@ -45,11 +48,14 @@ class RegistrationSerializer(RegisterSerializer):
                                                   name=self.cleaned_data.get('name', ''))
 
         if is_therapist:
-            Therapist.objects.create(user=user, bio=self.cleaned_data.get('bio', ''),
-                                     phone_number=self.validated_data.get('phone_number', ''),
-                                     office_number=self.validated_data.get('office_number', ''),
-                                     #specialisation=self.validated_data.get('specialisation', ''),
-                                     address=self.validated_data.get('address', ''))
+            therapist = Therapist.objects.create(user=user, bio=self.cleaned_data.get('bio', ''),
+                                                 phone_number=self.validated_data.get('phone_number', ''),
+                                                 office_number=self.validated_data.get('office_number', ''),
+                                                 address=self.validated_data.get('address', ''))
+            specialties = self.validated_data.get('specialties', '').split(",")
+            for specialty in specialties:
+                TherapistSpecialties.objects.create(therapist=therapist, specialty=specialty)
+
             # only handling stripe accounts for therapists for now
             # TODO run this again in case of migration from regular account -> therapist account
             account = setup_stripe_account(user, user_profile)

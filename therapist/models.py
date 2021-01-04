@@ -29,13 +29,26 @@ class Therapist(models.Model):
     phone_number = models.CharField(max_length=30, blank=True, null=True)
     office_number = models.CharField(max_length=30, blank=True, null=True)
     address = models.CharField(max_length=160, blank=True, null=True)
+    afm = models.CharField(max_length=60, blank=True, null=True)
+    doy = models.CharField(max_length=300, blank=True, null=True)
+    iban = models.CharField(max_length=40, blank=True, null=True)
     license = models.ImageField(upload_to='licenses/', null=True, blank=True)
+    id_back = models.ImageField(upload_to='id/', null=True, blank=True)
+    id_front = models.ImageField(upload_to='id/', null=True, blank=True)
 
     def __str__(self):
         return str(self.user.email)
 
     class Meta:
         ordering = ('created',)
+
+
+class TherapistSpecialties(models.Model):
+    therapist = models.ForeignKey(Therapist, on_delete=models.CASCADE, related_name="specialties")
+    specialty = models.CharField(max_length=50)
+
+    def __str__(self):
+        return self.specialty
 
 
 class TherapySession(models.Model):
