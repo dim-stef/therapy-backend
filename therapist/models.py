@@ -1,6 +1,7 @@
 from django.db import models
 from django.db.models.signals import post_save
 from django.dispatch import receiver
+from djmoney.models.fields import MoneyField
 from accounts.models import User
 import uuid
 from datetime import timedelta, datetime
@@ -35,6 +36,7 @@ class Therapist(models.Model):
     license = models.ImageField(upload_to='licenses/', null=True, blank=True)
     id_back = models.ImageField(upload_to='id/', null=True, blank=True)
     id_front = models.ImageField(upload_to='id/', null=True, blank=True)
+    credit = MoneyField(max_digits=6, decimal_places=2, default_currency='EUR', default=0.0)
 
     def __str__(self):
         return str(self.user.email)

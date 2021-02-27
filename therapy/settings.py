@@ -39,10 +39,11 @@ ALLOWED_HOSTS = os.environ.get("DJANGO_ALLOWED_HOSTS", "127.0.0.1,localhost").sp
 CORS_ORIGIN_ALLOW_ALL = True
 
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
-FORCE_SCRIPT_NAME = '/api'
+# FORCE_SCRIPT_NAME = '/api'
 # Application definition
 
 INSTALLED_APPS = [
+    'accounts',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -59,7 +60,7 @@ INSTALLED_APPS = [
     'rest_auth.registration',
     'django_filters',
     'corsheaders',
-    'accounts',
+    'djmoney',
     'therapist',
 ]
 
@@ -80,7 +81,7 @@ ROOT_URLCONF = 'therapy.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [os.path.join(BASE_DIR, 'accounts/templates')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -145,7 +146,12 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 REST_AUTH_REGISTER_SERIALIZERS = {
-        'REGISTER_SERIALIZER': 'accounts.serializers.RegistrationSerializer',
+    'REGISTER_SERIALIZER': 'accounts.serializers.RegistrationSerializer',
+}
+
+REST_AUTH_SERIALIZERS = {
+    'PASSWORD_RESET_SERIALIZER': 'accounts.serializers.CustomPasswordResetSerializer',
+    'PASSWORD_RESET_CONFIRM_SERIALIZER': 'accounts.serializers.PasswordResetConfirmSerializer',
 }
 
 SIMPLE_JWT = {
@@ -192,7 +198,7 @@ SITE_ID = 1
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.0/howto/static-files/
 
-STATIC_URL = '/staticfiles/'
+STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 MEDIA_URL = '/media/'

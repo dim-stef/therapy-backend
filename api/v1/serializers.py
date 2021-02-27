@@ -109,7 +109,8 @@ class TherapistSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Therapist
-        fields = ['id', 'bio', 'profile', 'availability_times', 'status', 'specialties']
+        fields = ['id', 'bio', 'profile', 'phone_number', 'office_number', 
+        'address', 'credit', 'availability_times', 'status', 'specialties']
 
 
 class TherapistWithSessionsSerializer(serializers.ModelSerializer):
@@ -133,7 +134,8 @@ class TherapistWithSessionsSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Therapist
-        fields = ['id', 'bio', 'profile', 'sessions', 'availability_times', 'status', 'specialties']
+        fields = ['id', 'bio', 'profile', 'phone_number', 'office_number', 'address', 'credit', 
+        'sessions', 'availability_times', 'status', 'specialties']
 
 
 class UpdateTherapistProfileSerializer(serializers.ModelSerializer):
@@ -144,7 +146,7 @@ class UpdateTherapistProfileSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Therapist
-        fields = ['license', 'bio']
+        fields = ['license', 'id_back', 'id_front', 'afm', 'doy', 'iban', 'bio']
 
 
 class AvailableTimeRangeSerializer(serializers.ModelSerializer):

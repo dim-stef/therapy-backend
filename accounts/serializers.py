@@ -1,12 +1,15 @@
 import os
 from django.contrib.sites.models import Site
+from django.contrib.auth.forms import PasswordResetForm
 from django.conf import settings
+from django.utils.translation import gettext as _
 from rest_auth.registration.serializers import RegisterSerializer
+from rest_auth.serializers import PasswordResetSerializer, PasswordResetConfirmSerializer
 from allauth.account.adapter import get_adapter
 from allauth.account.utils import setup_user_email
 from rest_framework import serializers
 from therapist.models import Therapist, TherapistSpecialties
-from .models import UserProfile
+from .models import UserProfile, User
 import stripe
 
 
@@ -14,6 +17,9 @@ class RegistrationSerializer(RegisterSerializer):
     is_therapist = serializers.BooleanField(required=False, write_only=True)
     name = serializers.CharField(required=True, write_only=True, max_length=60)
     bio = serializers.CharField(max_length=300, write_only=True, required=False)
+    office_number = serializers.CharField(max_length=300, write_only=True, required=False)
+    phone_number = serializers.CharField(max_length=300, write_only=True, required=False)
+    address = serializers.CharField(max_length=300, write_only=True, required=False)
     # specialties come as a comma separated string
     specialties = serializers.CharField(max_length=1000, write_only=True, required=False)
 
@@ -64,6 +70,26 @@ class RegistrationSerializer(RegisterSerializer):
         user.save()
         return user
 
+
+class CustomPasswordResetSerializer(PasswordResetSerializer):
+    def get_email_options(self):
+        return {
+            'html_email_template_name': 'registration/'
+                                    'password_reset_message.html',
+            'extra_email_context': {
+                'frontend_url': 'https://%s' % (Site.objects.get_current().domain),
+            }
+        }
+
+class CustomPasswordResetConfirmSerializer(PasswordResetConfirmSerializer):
+    def get_email_options(self):
+        return {
+            'html_email_template_name': 'registration/'
+                                    'password_reset_message.html',
+            'extra_email_context': {
+                'frontend_url': 'https://%s' % (Site.objects.get_current().domain),
+            }
+        }
 
 def setup_stripe_account(user, user_profile):
     stripe.api_key = os.environ.get('STRIPE_SECRET_KEY')

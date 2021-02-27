@@ -19,8 +19,9 @@ class UserMeViewSet(viewsets.ModelViewSet):
         return User.objects.filter(pk=self.request.user.pk)
 
 
-class TherapistsViewSet(viewsets.GenericViewSet, mixins.ListModelMixin):
+class TherapistsViewSet(viewsets.GenericViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin):
     serializer_class = serializers.TherapistWithSessionsSerializer
+    lookup_field = 'surrogate'
 
     def get_queryset(self):
         return Therapist.objects.filter(user__profile__charges_enabled=True)
