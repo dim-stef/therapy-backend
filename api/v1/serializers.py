@@ -1,6 +1,8 @@
 import os
 from rest_framework import serializers
+from django.db.models import Avg
 from accounts.models import User, UserProfile
+from reviews.models import Review
 from therapist.models import Therapist, TherapySession, AvailableTimeRange
 import stripe
 
@@ -96,6 +98,7 @@ class TherapistSerializer(serializers.ModelSerializer):
     specialties = serializers.StringRelatedField(many=True)
     availability_times = serializers.SerializerMethodField()
     profile = serializers.SerializerMethodField()
+    reviews = serializers.SerializerMethodField()
     id = serializers.SerializerMethodField()
 
     def get_availability_times(self, therapist):
@@ -107,10 +110,23 @@ class TherapistSerializer(serializers.ModelSerializer):
     def get_profile(self, therapist):
         return UserProfileSerializer(therapist.user.profile).data
 
+    def get_review(self, therapist):
+        user = self.context.get('user')
+        if user and user.is_authenticated:
+            review = Review.objects.filter(user=user, therapist=therapist)
+            if review.exists():
+                return ReviewSerializer(review.first()).data
+        return None
+
+    def get_reviews(self, therapist):
+        average_rating = therapist.reviews.all().aggregate(Avg('stars'))['stars__avg']
+        rating_count = therapist.reviews.count()
+        return {'average_rating': average_rating, 'count': rating_count}
+
     class Meta:
         model = Therapist
         fields = ['id', 'bio', 'profile', 'phone_number', 'office_number', 
-        'address', 'credit', 'availability_times', 'status', 'specialties']
+        'address', 'credit', 'availability_times', 'status', 'specialties', 'review', 'reviews']
 
 
 class TherapistWithSessionsSerializer(serializers.ModelSerializer):
@@ -118,6 +134,8 @@ class TherapistWithSessionsSerializer(serializers.ModelSerializer):
     profile = serializers.SerializerMethodField()
     availability_times = serializers.SerializerMethodField()
     sessions = serializers.SerializerMethodField()
+    review = serializers.SerializerMethodField()
+    reviews = serializers.SerializerMethodField()
     id = serializers.SerializerMethodField()
 
     def get_id(self, therapist):
@@ -132,10 +150,58 @@ class TherapistWithSessionsSerializer(serializers.ModelSerializer):
     def get_sessions(self, therapist):
         return TherapySessionSerializer(therapist.sessions.all(), many=True).data
 
+    def get_review(self, therapist):
+        user = self.context.get('user')
+        if user and user.is_authenticated:
+            review = Review.objects.filter(user=user, therapist=therapist)
+            if review.exists():
+                return ReviewSerializer(review.first()).data
+        return None
+
+    def get_reviews(self, therapist):
+        average_rating = therapist.reviews.all().aggregate(Avg('stars'))['stars__avg']
+        rating_count = therapist.reviews.count()
+        return {'average_rating': average_rating, 'count': rating_count}
+
     class Meta:
         model = Therapist
         fields = ['id', 'bio', 'profile', 'phone_number', 'office_number', 'address', 'credit', 
-        'sessions', 'availability_times', 'status', 'specialties']
+        'sessions', 'availability_times', 'status', 'specialties', 'review', 'reviews']
+
+
+class ReviewSerializer(serializers.ModelSerializer):
+    therapist = serializers.UUIDField(required=True)
+    id = serializers.SerializerMethodField()
+
+    def get_id(self, review):
+        return review.surrogate
+
+    def create(self, validated_data):
+        user = self.context.get('user')
+        try:
+            therapist_surrogate = validated_data.pop('therapist')
+        except KeyError:
+            therapist_surrogate = None
+
+        therapist = Therapist.objects.get(surrogate=therapist_surrogate)
+        instance = Review.objects.create(user=user, therapist=therapist, **validated_data)
+        return instance
+
+    def update(self, instance, validated_data):
+        try:
+            therapist_surrogate = validated_data.pop('therapist')
+        except KeyError:
+            therapist_surrogate = None
+
+        therapist = Therapist.objects.get(surrogate=therapist_surrogate)
+        instance.therapist = therapist
+        instance = super(ReviewSerializer, self).update(instance, validated_data)
+        return instance
+
+    class Meta:
+        model = Review
+        fields = ['therapist', 'user', 'stars', 'id']
+        read_only_fields = ['user', 'id']
 
 
 class UpdateTherapistProfileSerializer(serializers.ModelSerializer):

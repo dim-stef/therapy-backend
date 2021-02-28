@@ -8,6 +8,7 @@ from rest_framework import viewsets, mixins, permissions, generics
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 from accounts.models import User, UserProfile
+from reviews.models import Review
 from therapist.models import Therapist, TherapySession, AvailableTimeRange
 from . import serializers
 
@@ -25,6 +26,11 @@ class TherapistsViewSet(viewsets.GenericViewSet, mixins.ListModelMixin, mixins.R
 
     def get_queryset(self):
         return Therapist.objects.filter(user__profile__charges_enabled=True)
+
+    def get_serializer_context(self):
+        return {
+            'user': self.request.user,
+        }
 
 
 class CreateTherapySessionViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin):
@@ -74,6 +80,27 @@ class UpdateTherapistProfileViewSet(viewsets.GenericViewSet, mixins.UpdateModelM
 
     def get_object(self):
         return self.request.user.therapist
+
+
+class ReviewSerializer(viewsets.ModelViewSet):
+    serializer_class = serializers.ReviewSerializer
+    queryset = Review.objects.all()
+    lookup_field = 'surrogate'
+
+    def get_permissions(self):
+        """
+        Instantiates and returns the list of permissions that this view requires.
+        """
+        if self.action == 'create':
+            permission_classes = [permissions.IsAuthenticated,]
+        else:
+            permission_classes = [permissions.AllowAny,]
+        return [permission() for permission in permission_classes]
+
+    def get_serializer_context(self):
+        return {
+            'user': self.request.user,
+        }
 
 
 class ChangeAvailabilityTimes(viewsets.GenericViewSet, mixins.CreateModelMixin):

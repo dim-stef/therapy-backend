@@ -62,6 +62,7 @@ INSTALLED_APPS = [
     'corsheaders',
     'djmoney',
     'therapist',
+    'reviews',
 ]
 
 MIDDLEWARE = [

@@ -14,6 +14,7 @@ router.register(r'my_sessions', views.MySessionsViewSet, basename="therapists_se
 router.register(r'user_profiles', views.ProfileViewSet, basename="user_profiles")
 router.register(r'update_user_profile', views.UpdateUserProfileViewSet, basename="update_user_profile")
 router.register(r'update_therapist_profile', views.UpdateTherapistProfileViewSet, basename="update_therapist_profile")
+router.register(r'reviews', views.ReviewSerializer, basename="reviews")
 
 urlpatterns = [
     path('v1/', include(router.urls)),
