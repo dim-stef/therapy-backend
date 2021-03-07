@@ -121,7 +121,8 @@ class ChangeAvailabilityTimes(viewsets.GenericViewSet, mixins.CreateModelMixin):
 def create_direct_payment(request, stripe_id):
     stripe.api_key = os.environ.get('STRIPE_SECRET_KEY')
     domain_url = request.scheme + '://' + request.get_host() + '/'
-    if settings.DEBUG:
+    # if settings.DEBUG:
+    if os.environ.get('DEVELOPMENT_MODE') == 'True' or os.environ.get('DEVELOPMENT_MODE') == True:
         domain_url = domain_url.replace('8000', '3000')
     payment_intent = stripe.PaymentIntent.create(
         payment_method_types=['card'],
@@ -151,7 +152,8 @@ def create_stripe_account_link(request):
     stripe.api_key = os.environ.get('STRIPE_SECRET_KEY')
     user_profile = request.user.profile
 
-    if settings.DEBUG:
+    #if settings.DEBUG:
+    if os.environ.get('DEVELOPMENT_MODE') == 'True' or os.environ.get('DEVELOPMENT_MODE') == True:
         redirect = 'http://localhost:3000/users/oauth/callback'
         refresh_url = "http://localhost:3000/reauth"
 
@@ -196,7 +198,8 @@ def connect_stripe_account(request):
 @permission_classes((permissions.AllowAny,))
 def create_checkout_session(request, stripe_id, session_id):
     domain_url = request.scheme + '://' + request.get_host() + '/'
-    if settings.DEBUG:
+    #if settings.DEBUG:
+    if os.environ.get('DEVELOPMENT_MODE') == 'True' or os.environ.get('DEVELOPMENT_MODE') == True:
         domain_url = domain_url.replace('8000', '3000')
 
     stripe.api_key = os.environ.get('STRIPE_SECRET_KEY')

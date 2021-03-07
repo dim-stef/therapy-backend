@@ -98,6 +98,7 @@ class TherapistSerializer(serializers.ModelSerializer):
     specialties = serializers.StringRelatedField(many=True)
     availability_times = serializers.SerializerMethodField()
     profile = serializers.SerializerMethodField()
+    review = serializers.SerializerMethodField()
     reviews = serializers.SerializerMethodField()
     id = serializers.SerializerMethodField()
 
