@@ -197,10 +197,12 @@ def connect_stripe_account(request):
 @api_view(http_method_names=['POST'])
 @permission_classes((permissions.AllowAny,))
 def create_checkout_session(request, stripe_id, session_id):
-    domain_url = request.scheme + '://' + request.get_host() + '/'
+    #domain_url = request.scheme + '://' + request.get_host() + '/'
+    domain_url = 'https://drempathy-app.herokuapp.com/'
     #if settings.DEBUG:
     if os.environ.get('DEVELOPMENT_MODE') == 'True' or os.environ.get('DEVELOPMENT_MODE') == True:
-        domain_url = domain_url.replace('8000', '3000')
+        #domain_url = domain_url.replace('8000', '3000')
+        domain_url = "http://localhost:8000/"
 
     stripe.api_key = os.environ.get('STRIPE_SECRET_KEY')
     try:
