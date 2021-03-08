@@ -250,6 +250,8 @@ def create_checkout_session(request, stripe_id, session_id):
 
 
 @csrf_exempt
+@api_view(http_method_names=['POST', 'PUT'])
+@permission_classes((permissions.AllowAny,))
 def check_out_success_webhook(request):
     payload = request.body
     sig_header = request.META['HTTP_STRIPE_SIGNATURE']
