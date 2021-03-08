@@ -158,8 +158,8 @@ def create_stripe_account_link(request):
         refresh_url = "http://localhost:3000/reauth"
 
     else:
-        redirect = 'https://%s%s' % (Site.objects.get_current().domain, '/users/oauth/callback')
-        refresh_url = 'https://%s%s' % (Site.objects.get_current().domain, '/reauth')
+        redirect = 'https://drempathy-app.herokuapp.com/users/oauth/callback'
+        refresh_url = 'https://drempathy-app.herokuapp.com/reauth'
 
     account_link = stripe.AccountLink.create(
         account=request.user.profile.stripe_id,
